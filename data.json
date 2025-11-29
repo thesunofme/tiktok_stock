@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "timestamp": 0,
+  "summary": {
+    "total_temp": 0,
+    "total_fresh": 0,
+    "total_full": 0,
+    "total_trusted": 0,
+    "total_countries": 0
+  },
+  "regions": []
+}
+
