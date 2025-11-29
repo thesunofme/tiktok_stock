@@ -189,13 +189,16 @@
             margin-right: 0.5rem;
         }
         .flag-emoji {
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Twemoji Mozilla", "EmojiOne Color", sans-serif;
             font-style: normal;
             font-weight: normal;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             display: inline-block;
             line-height: 1;
+            font-size: 1.3rem !important;
+            vertical-align: middle;
+            text-rendering: optimizeLegibility;
         }
         .empty-state {
             text-align: center;
@@ -393,28 +396,43 @@
             });
         }
         
-        // Get country flag emoji
+        // Get country flag emoji using Unicode Regional Indicator Symbols
         function getCountryFlag(code) {
             if (!code) return '🌍';
             
             // Normalize code (uppercase, handle UK/GB)
-            const normalizedCode = String(code).toUpperCase().trim();
+            let normalizedCode = String(code).toUpperCase().trim();
             
             // Map UK to GB for flag
-            const codeMap = {
-                'UK': 'GB'
-            };
-            const finalCode = codeMap[normalizedCode] || normalizedCode;
+            if (normalizedCode === 'UK') {
+                normalizedCode = 'GB';
+            }
             
+            // Convert country code to flag emoji using Unicode Regional Indicator Symbols
+            // Each letter is converted to its regional indicator symbol (U+1F1E6 to U+1F1FF)
+            if (normalizedCode.length === 2) {
+                const codePointA = normalizedCode.codePointAt(0);
+                const codePointB = normalizedCode.codePointAt(1);
+                
+                if (codePointA >= 65 && codePointA <= 90 && codePointB >= 65 && codePointB <= 90) {
+                    // Convert A-Z (65-90) to Regional Indicator Symbols (127462-127487)
+                    const flagA = String.fromCodePoint(codePointA - 65 + 127462);
+                    const flagB = String.fromCodePoint(codePointB - 65 + 127462);
+                    return flagA + flagB;
+                }
+            }
+            
+            // Fallback: use predefined flags for common countries
             const flags = {
                 'US': '🇺🇸', 'DE': '🇩🇪', 'FR': '🇫🇷', 'GB': '🇬🇧', 'UK': '🇬🇧', 'CA': '🇨🇦',
                 'UA': '🇺🇦', 'KZ': '🇰🇿', 'AR': '🇦🇷', 'RU': '🇷🇺', 'IT': '🇮🇹',
                 'PL': '🇵🇱', 'CH': '🇨🇭', 'MX': '🇲🇽', 'VN': '🇻🇳', 'BY': '🇧🇾',
-                'ES': '🇪🇸', 'BR': '🇧🇷', 'KR': '🇰🇷', 'JP': '🇯🇵'
+                'ES': '🇪🇸', 'BR': '🇧🇷', 'KR': '🇰🇷', 'JP': '🇯🇵', 'CN': '🇨🇳',
+                'IN': '🇮🇳', 'AU': '🇦🇺', 'NL': '🇳🇱', 'BE': '🇧🇪', 'SE': '🇸🇪',
+                'NO': '🇳🇴', 'DK': '🇩🇰', 'FI': '🇫🇮', 'PT': '🇵🇹', 'GR': '🇬🇷'
             };
             
-            const flag = flags[finalCode] || flags[normalizedCode] || '🌍';
-            return flag;
+            return flags[normalizedCode] || '🌍';
         }
         
         // Display data
@@ -451,8 +469,8 @@
                 // Get country flag once for this region
                 const countryFlag = getCountryFlag(region.code);
                 
-                // Debug: Log flag for troubleshooting (remove in production if needed)
-                // console.log(`Country: ${region.country}, Code: ${region.code}, Flag: ${countryFlag}`);
+                // Debug: Log flag for troubleshooting
+                console.log(`Country: ${region.country}, Code: ${region.code}, Flag: ${countryFlag}, Flag Length: ${countryFlag.length}`);
                 
                 let stockHTML = '';
                 const stockTypes = [
@@ -467,7 +485,7 @@
                         stockHTML += `
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm text-gray-600 flex items-center gap-2">
-                                    <span class="flag-emoji" style="font-size: 1.3rem; line-height: 1; display: inline-block; min-width: 1.5rem; text-align: center;">${countryFlag}</span>
+                                    <span class="flag-emoji" role="img" aria-label="${region.country || region.code} flag" style="min-width: 1.5rem; text-align: center;">${countryFlag}</span>
                                     <i class="fas fa-${type.icon}"></i> ${type.label}
                                 </span>
                                 <span class="stock-badge ${type.class}">
