@@ -8,6 +8,7 @@
     <link rel="shortcut icon" type="image/png" href="tiktok_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
     <style>
         body {
             background-image: url('background.png');
@@ -292,6 +293,31 @@
             </div>
         </div>
 
+        <!-- Contact Information -->
+        <div class="card p-6 mt-8 animate-fadeIn">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">
+                <i class="fas fa-envelope"></i> Contact Us
+            </h2>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <a href="https://t.me/reelduck" target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-3 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+                    <i class="fab fa-telegram-plane text-2xl"></i>
+                    <div class="text-left">
+                        <div class="text-xs opacity-90">Telegram</div>
+                        <div class="font-semibold">@reelduck</div>
+                    </div>
+                </a>
+                <a href="mailto:thesunofmegame@gmail.com" 
+                   class="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+                    <i class="fas fa-envelope text-2xl"></i>
+                    <div class="text-left">
+                        <div class="text-xs opacity-90">Email</div>
+                        <div class="font-semibold">thesunofmegame@gmail.com</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
         <!-- Footer -->
         <div class="text-center mt-8 text-white/80 text-sm">
             <p><i class="fas fa-sync-alt"></i> Data updates automatically</p>
@@ -320,15 +346,23 @@
             });
         }
         
-        // Get country flag emoji (simplified)
+        // Get country flag emoji
         function getCountryFlag(code) {
+            // Normalize code (uppercase, handle UK/GB)
+            const normalizedCode = code ? code.toUpperCase().trim() : '';
+            const codeMap = {
+                'UK': 'GB', // UK maps to GB flag
+                'GB': 'GB'
+            };
+            const finalCode = codeMap[normalizedCode] || normalizedCode;
+            
             const flags = {
-                'US': '🇺🇸', 'DE': '🇩🇪', 'FR': '🇫🇷', 'UK': '🇬🇧', 'CA': '🇨🇦',
+                'US': '🇺🇸', 'DE': '🇩🇪', 'FR': '🇫🇷', 'GB': '🇬🇧', 'UK': '🇬🇧', 'CA': '🇨🇦',
                 'UA': '🇺🇦', 'KZ': '🇰🇿', 'AR': '🇦🇷', 'RU': '🇷🇺', 'IT': '🇮🇹',
                 'PL': '🇵🇱', 'CH': '🇨🇭', 'MX': '🇲🇽', 'VN': '🇻🇳', 'BY': '🇧🇾',
                 'ES': '🇪🇸', 'BR': '🇧🇷', 'KR': '🇰🇷', 'JP': '🇯🇵'
             };
-            return flags[code] || '🌍';
+            return flags[finalCode] || flags[normalizedCode] || '🌍';
         }
         
         // Display data
@@ -375,7 +409,7 @@
                         stockHTML += `
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm text-gray-600 flex items-center gap-2">
-                                    <span class="text-lg">${getCountryFlag(region.code)}</span>
+                                    <span class="text-base" style="font-size: 1.2rem;">${getCountryFlag(region.code)}</span>
                                     <i class="fas fa-${type.icon}"></i> ${type.label}
                                 </span>
                                 <span class="stock-badge ${type.class}">
