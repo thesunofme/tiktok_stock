@@ -348,11 +348,14 @@
         
         // Get country flag emoji
         function getCountryFlag(code) {
+            if (!code) return '🌍';
+            
             // Normalize code (uppercase, handle UK/GB)
-            const normalizedCode = code ? code.toUpperCase().trim() : '';
+            const normalizedCode = String(code).toUpperCase().trim();
+            
+            // Map UK to GB for flag
             const codeMap = {
-                'UK': 'GB', // UK maps to GB flag
-                'GB': 'GB'
+                'UK': 'GB'
             };
             const finalCode = codeMap[normalizedCode] || normalizedCode;
             
@@ -362,7 +365,9 @@
                 'PL': '🇵🇱', 'CH': '🇨🇭', 'MX': '🇲🇽', 'VN': '🇻🇳', 'BY': '🇧🇾',
                 'ES': '🇪🇸', 'BR': '🇧🇷', 'KR': '🇰🇷', 'JP': '🇯🇵'
             };
-            return flags[finalCode] || flags[normalizedCode] || '🌍';
+            
+            const flag = flags[finalCode] || flags[normalizedCode] || '🌍';
+            return flag;
         }
         
         // Display data
@@ -396,6 +401,9 @@
                 const card = document.createElement('div');
                 card.className = 'region-card bg-white rounded-xl p-6 shadow-md';
                 
+                // Get country flag once for this region
+                const countryFlag = getCountryFlag(region.code);
+                
                 let stockHTML = '';
                 const stockTypes = [
                     { key: 'temp', label: 'Temporary Email', icon: 'envelope', class: 'stock-temp' },
@@ -409,7 +417,7 @@
                         stockHTML += `
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm text-gray-600 flex items-center gap-2">
-                                    <span class="text-base" style="font-size: 1.2rem;">${getCountryFlag(region.code)}</span>
+                                    <span class="text-xl" style="line-height: 1; display: inline-block; font-size: 1.25rem;">${countryFlag}</span>
                                     <i class="fas fa-${type.icon}"></i> ${type.label}
                                 </span>
                                 <span class="stock-badge ${type.class}">
@@ -438,7 +446,7 @@
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-xl font-bold text-gray-800 flex items-center">
-                            <span class="flag-icon">${getCountryFlag(region.code)}</span>
+                            <span class="flag-icon">${countryFlag}</span>
                             ${region.country}
                         </h3>
                         <div class="flex items-center gap-2">
