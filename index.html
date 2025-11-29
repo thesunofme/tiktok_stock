@@ -470,7 +470,7 @@
                 const card = document.createElement('div');
                 card.className = 'region-card bg-white rounded-xl p-6 shadow-md';
                 
-                // Get country flag once for this region
+                // Get country flag for header only
                 const countryFlag = getCountryFlag(region.code);
                 
                 let stockHTML = '';
@@ -486,7 +486,6 @@
                         stockHTML += `
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm text-gray-600 flex items-center gap-2">
-                                    <span class="flag-emoji" role="img" aria-label="${region.country || region.code} flag">${countryFlag}</span>
                                     <i class="fas fa-${type.icon}"></i> ${type.label}
                                 </span>
                                 <span class="stock-badge ${type.class}">
