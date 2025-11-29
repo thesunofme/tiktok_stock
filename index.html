@@ -196,9 +196,13 @@
             -moz-osx-font-smoothing: grayscale;
             display: inline-block;
             line-height: 1;
-            font-size: 1.3rem !important;
+            font-size: 1.4rem !important;
             vertical-align: middle;
             text-rendering: optimizeLegibility;
+            width: 1.5rem;
+            height: 1.5rem;
+            text-align: center;
+            flex-shrink: 0;
         }
         .empty-state {
             text-align: center;
@@ -469,9 +473,6 @@
                 // Get country flag once for this region
                 const countryFlag = getCountryFlag(region.code);
                 
-                // Debug: Log flag for troubleshooting
-                console.log(`Country: ${region.country}, Code: ${region.code}, Flag: ${countryFlag}, Flag Length: ${countryFlag.length}`);
-                
                 let stockHTML = '';
                 const stockTypes = [
                     { key: 'temp', label: 'Temporary Email', icon: 'envelope', class: 'stock-temp' },
@@ -485,7 +486,7 @@
                         stockHTML += `
                             <div class="flex items-center justify-between py-2">
                                 <span class="text-sm text-gray-600 flex items-center gap-2">
-                                    <span class="flag-emoji" role="img" aria-label="${region.country || region.code} flag" style="min-width: 1.5rem; text-align: center;">${countryFlag}</span>
+                                    <span class="flag-emoji" role="img" aria-label="${region.country || region.code} flag">${countryFlag}</span>
                                     <i class="fas fa-${type.icon}"></i> ${type.label}
                                 </span>
                                 <span class="stock-badge ${type.class}">
