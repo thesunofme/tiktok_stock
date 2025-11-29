@@ -1,13 +1,148 @@
 {
-  "success": true,
-  "timestamp": 0,
-  "summary": {
-    "total_temp": 0,
-    "total_fresh": 0,
-    "total_full": 0,
-    "total_trusted": 0,
-    "total_countries": 0
-  },
-  "regions": []
+"success": true,
+"timestamp": 1764406532,
+"summary": {
+"total_temp": 385,
+"total_fresh": 48706,
+"total_full": 0,
+"total_trusted": 0,
+"total_countries": 15
+},
+"regions": [
+{
+"country": "Switzerland",
+"code": "CH",
+"temp": 57,
+"fresh": 5148,
+"full": 0,
+"trusted": 0,
+"total": 5205
+},
+{
+"country": "Argentina",
+"code": "AR",
+"temp": 0,
+"fresh": 5021,
+"full": 0,
+"trusted": 0,
+"total": 5021
+},
+{
+"country": "Kazakhstan",
+"code": "KZ",
+"temp": 39,
+"fresh": 4802,
+"full": 0,
+"trusted": 0,
+"total": 4841
+},
+{
+"country": "Mexico",
+"code": "MX",
+"temp": 24,
+"fresh": 4817,
+"full": 0,
+"trusted": 0,
+"total": 4841
+},
+{
+"country": "Canada",
+"code": "CA",
+"temp": 57,
+"fresh": 4585,
+"full": 0,
+"trusted": 0,
+"total": 4642
+},
+{
+"country": "Russia",
+"code": "RU",
+"temp": 3,
+"fresh": 4592,
+"full": 0,
+"trusted": 0,
+"total": 4595
+},
+{
+"country": "Vietnam",
+"code": "VN",
+"temp": 73,
+"fresh": 4517,
+"full": 0,
+"trusted": 0,
+"total": 4590
+},
+{
+"country": "Ukraine",
+"code": "UA",
+"temp": 25,
+"fresh": 4350,
+"full": 0,
+"trusted": 0,
+"total": 4375
+},
+{
+"country": "Belarus",
+"code": "BY",
+"temp": 0,
+"fresh": 3775,
+"full": 0,
+"trusted": 0,
+"total": 3775
+},
+{
+"country": "United Kingdom",
+"code": "UK",
+"temp": 22,
+"fresh": 3484,
+"full": 0,
+"trusted": 0,
+"total": 3506
+},
+{
+"country": "Italy",
+"code": "IT",
+"temp": 47,
+"fresh": 965,
+"full": 0,
+"trusted": 0,
+"total": 1012
+},
+{
+"country": "France",
+"code": "FR",
+"temp": 25,
+"fresh": 912,
+"full": 0,
+"trusted": 0,
+"total": 937
+},
+{
+"country": "Germany",
+"code": "DE",
+"temp": 0,
+"fresh": 883,
+"full": 0,
+"trusted": 0,
+"total": 883
+},
+{
+"country": "Poland",
+"code": "PL",
+"temp": 13,
+"fresh": 855,
+"full": 0,
+"trusted": 0,
+"total": 868
+},
+{
+"country": "United States",
+"code": "US",
+"temp": 0,
+"fresh": 0,
+"full": 0,
+"trusted": 0,
+"total": 0
 }
-
+]
+}
