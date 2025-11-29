@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kho Hàng TikTok Accounts</title>
+    <title>TikTok Accounts Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,11 +24,14 @@
             box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
         }
         .stock-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.5rem 1rem;
             border-radius: 9999px;
             font-weight: 600;
             font-size: 0.875rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         .stock-temp {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -48,10 +52,27 @@
         .region-card {
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .region-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .region-card:hover::before {
+            transform: scaleX(1);
         }
         .region-card:hover {
             border-color: #667eea;
             transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
         }
         @keyframes fadeIn {
             from {
@@ -70,18 +91,56 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
+        .summary-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .summary-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
         .loading {
             text-align: center;
             padding: 3rem;
             color: white;
         }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .error {
             background: rgba(239, 68, 68, 0.1);
             border: 2px solid #ef4444;
             color: #dc2626;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 0.5rem;
             text-align: center;
+        }
+        .flag-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -90,57 +149,72 @@
         <!-- Header -->
         <div class="text-center mb-8 animate-fadeIn">
             <h1 class="text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
-                📦 Kho Hàng TikTok Accounts
+                <i class="fas fa-box-open"></i> TikTok Accounts Inventory
             </h1>
-            <p class="text-xl text-white/90">Xem số lượng tài khoản có sẵn theo từng quốc gia</p>
+            <p class="text-xl text-white/90">Real-time stock availability by country</p>
         </div>
 
         <!-- Loading State -->
         <div id="loading" class="loading">
-            <div class="text-2xl mb-2">⏳</div>
-            <div>Đang tải dữ liệu...</div>
+            <div class="loading-spinner"></div>
+            <div class="text-2xl mb-2">Loading inventory data...</div>
+            <div class="text-sm opacity-75">Please wait</div>
         </div>
 
         <!-- Error State -->
         <div id="error" class="error" style="display: none;">
-            <div class="text-xl font-bold mb-2">❌ Lỗi tải dữ liệu</div>
-            <div id="error-message"></div>
-            <button onclick="loadData()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                Thử lại
+            <div class="text-xl font-bold mb-2">
+                <i class="fas fa-exclamation-triangle"></i> Error Loading Data
+            </div>
+            <div id="error-message" class="mb-4"></div>
+            <button onclick="loadData()" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                <i class="fas fa-redo"></i> Retry
             </button>
         </div>
 
         <!-- Content -->
         <div id="content" style="display: none;">
-            <!-- Tổng quan -->
+            <!-- Summary Overview -->
             <div class="summary-card card p-6 mb-8 animate-fadeIn">
-                <h2 class="text-2xl font-bold mb-4 text-center">📊 Tổng Quan Kho Hàng</h2>
+                <h2 class="text-2xl font-bold mb-6 text-center">
+                    <i class="fas fa-chart-bar"></i> Inventory Overview
+                </h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center">
-                        <div id="total-temp" class="text-4xl font-bold mb-2">0</div>
-                        <div class="text-sm opacity-90">TEMPORARY EMAIL</div>
+                    <div class="summary-item text-center">
+                        <div class="text-4xl font-bold mb-2" id="total-temp">0</div>
+                        <div class="text-sm opacity-90 flex items-center justify-center gap-2">
+                            <i class="fas fa-envelope"></i> Temporary Email
+                        </div>
                     </div>
-                    <div class="text-center">
-                        <div id="total-fresh" class="text-4xl font-bold mb-2">0</div>
-                        <div class="text-sm opacity-90">FRESH ACCOUNT</div>
+                    <div class="summary-item text-center">
+                        <div class="text-4xl font-bold mb-2" id="total-fresh">0</div>
+                        <div class="text-sm opacity-90 flex items-center justify-center gap-2">
+                            <i class="fas fa-seedling"></i> Fresh Account
+                        </div>
                     </div>
-                    <div class="text-center">
-                        <div id="total-full" class="text-4xl font-bold mb-2">0</div>
-                        <div class="text-sm opacity-90">FULL SETUP</div>
+                    <div class="summary-item text-center">
+                        <div class="text-4xl font-bold mb-2" id="total-full">0</div>
+                        <div class="text-sm opacity-90 flex items-center justify-center gap-2">
+                            <i class="fas fa-user-check"></i> Full Setup
+                        </div>
                     </div>
-                    <div class="text-center">
-                        <div id="total-trusted" class="text-4xl font-bold mb-2">0</div>
-                        <div class="text-sm opacity-90">TRUSTED</div>
+                    <div class="summary-item text-center">
+                        <div class="text-4xl font-bold mb-2" id="total-trusted">0</div>
+                        <div class="text-sm opacity-90 flex items-center justify-center gap-2">
+                            <i class="fas fa-shield-alt"></i> Trusted
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Danh sách theo quốc gia -->
+            <!-- Countries List -->
             <div class="card p-6 animate-fadeIn">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-3xl font-bold text-gray-800">🌍 Kho Hàng Theo Quốc Gia</h2>
-                    <div class="text-sm text-gray-500">
-                        Tổng: <span id="total-countries" class="font-bold text-gray-700">0</span> quốc gia
+                    <h2 class="text-3xl font-bold text-gray-800">
+                        <i class="fas fa-globe"></i> Inventory by Country
+                    </h2>
+                    <div class="text-sm text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
+                        <i class="fas fa-list"></i> Total: <span id="total-countries" class="font-bold text-gray-700">0</span> countries
                     </div>
                 </div>
                 
@@ -152,44 +226,67 @@
 
         <!-- Footer -->
         <div class="text-center mt-8 text-white/80 text-sm">
-            <p>Dữ liệu được cập nhật tự động</p>
-            <p class="text-xs mt-1">Cập nhật lần cuối: <span id="last-update">-</span></p>
+            <p><i class="fas fa-sync-alt"></i> Data updates automatically</p>
+            <p class="text-xs mt-1 opacity-75">Last updated: <span id="last-update">-</span></p>
         </div>
     </div>
 
     <script>
-        // Cấu hình API URL
-        const API_URL = 'https://valorantunlocker.shop/tiktok_fetch/api_public.php';
+        // Load data from local JSON file (updated by GitHub Actions)
+        const DATA_FILE = 'data.json';
         
-        // Format số
+        // Format number with commas
         function formatNumber(num) {
-            return new Intl.NumberFormat('vi-VN').format(num);
+            return new Intl.NumberFormat('en-US').format(num);
         }
         
-        // Format thời gian
+        // Format timestamp
         function formatTime(timestamp) {
             const date = new Date(timestamp * 1000);
-            return date.toLocaleString('vi-VN');
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
         
-        // Hiển thị dữ liệu
+        // Get country flag emoji (simplified)
+        function getCountryFlag(code) {
+            const flags = {
+                'US': '🇺🇸', 'DE': '🇩🇪', 'FR': '🇫🇷', 'UK': '🇬🇧', 'CA': '🇨🇦',
+                'UA': '🇺🇦', 'KZ': '🇰🇿', 'AR': '🇦🇷', 'RU': '🇷🇺', 'IT': '🇮🇹',
+                'PL': '🇵🇱', 'CH': '🇨🇭', 'MX': '🇲🇽', 'VN': '🇻🇳', 'BY': '🇧🇾',
+                'ES': '🇪🇸', 'BR': '🇧🇷', 'KR': '🇰🇷', 'JP': '🇯🇵'
+            };
+            return flags[code] || '🌍';
+        }
+        
+        // Display data
         function displayData(data) {
-            // Hiển thị tổng quan
+            // Display summary
             document.getElementById('total-temp').textContent = formatNumber(data.summary.total_temp);
             document.getElementById('total-fresh').textContent = formatNumber(data.summary.total_fresh);
             document.getElementById('total-full').textContent = formatNumber(data.summary.total_full);
             document.getElementById('total-trusted').textContent = formatNumber(data.summary.total_trusted);
             document.getElementById('total-countries').textContent = data.summary.total_countries;
             
-            // Hiển thị thời gian cập nhật
+            // Display last update time
             document.getElementById('last-update').textContent = formatTime(data.timestamp);
             
-            // Hiển thị danh sách quốc gia
+            // Display countries list
             const container = document.getElementById('regions-container');
             container.innerHTML = '';
             
             if (data.regions.length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-gray-500 text-lg">Chưa có dữ liệu kho hàng</p></div>';
+                container.innerHTML = `
+                    <div class="col-span-full empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p class="text-lg font-semibold">No inventory data available</p>
+                        <p class="text-sm mt-2">Please check back later</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -198,35 +295,57 @@
                 card.className = 'region-card bg-white rounded-xl p-6 shadow-md';
                 
                 let stockHTML = '';
-                if (region.temp > 0) {
-                    stockHTML += `<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Temporary Email</span><span class="stock-badge stock-temp">${formatNumber(region.temp)}</span></div>`;
-                }
-                if (region.fresh > 0) {
-                    stockHTML += `<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Fresh Account</span><span class="stock-badge stock-fresh">${formatNumber(region.fresh)}</span></div>`;
-                }
-                if (region.full > 0) {
-                    stockHTML += `<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Full Setup</span><span class="stock-badge stock-full">${formatNumber(region.full)}</span></div>`;
-                }
-                if (region.trusted > 0) {
-                    stockHTML += `<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Trusted Account</span><span class="stock-badge stock-trusted">${formatNumber(region.trusted)}</span></div>`;
-                }
+                const stockTypes = [
+                    { key: 'temp', label: 'Temporary Email', icon: 'envelope', class: 'stock-temp' },
+                    { key: 'fresh', label: 'Fresh Account', icon: 'seedling', class: 'stock-fresh' },
+                    { key: 'full', label: 'Full Setup', icon: 'user-check', class: 'stock-full' },
+                    { key: 'trusted', label: 'Trusted Account', icon: 'shield-alt', class: 'stock-trusted' }
+                ];
+                
+                stockTypes.forEach(type => {
+                    if (region[type.key] > 0) {
+                        stockHTML += `
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-sm text-gray-600 flex items-center gap-2">
+                                    <i class="fas fa-${type.icon}"></i> ${type.label}
+                                </span>
+                                <span class="stock-badge ${type.class}">
+                                    <i class="fas fa-box"></i> ${formatNumber(region[type.key])}
+                                </span>
+                            </div>
+                        `;
+                    }
+                });
+                
                 if (region.total === 0) {
-                    stockHTML = '<div class="text-center py-4"><span class="text-gray-400 text-sm">Hết hàng</span></div>';
+                    stockHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-box-open text-gray-400 text-2xl mb-2"></i>
+                            <span class="text-gray-400 text-sm block">Out of Stock</span>
+                        </div>
+                    `;
                 }
                 
                 const totalBadge = region.total > 0 
-                    ? `<span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Tổng: ${formatNumber(region.total)}</span>`
+                    ? `<span class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full flex items-center gap-1">
+                        <i class="fas fa-check-circle"></i> Total: ${formatNumber(region.total)}
+                       </span>`
                     : '';
                 
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-gray-800">${region.country}</h3>
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                            <span class="flag-icon">${getCountryFlag(region.code)}</span>
+                            ${region.country}
+                        </h3>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">${region.code}</span>
+                            <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                ${region.code}
+                            </span>
                             ${totalBadge}
                         </div>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-2">
                         ${stockHTML}
                     </div>
                 `;
@@ -235,7 +354,7 @@
             });
         }
         
-        // Tải dữ liệu
+        // Load data
         async function loadData() {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
@@ -246,7 +365,8 @@
             content.style.display = 'none';
             
             try {
-                const response = await fetch(API_URL);
+                // Fetch from local JSON file (no external API visible)
+                const response = await fetch(DATA_FILE + '?t=' + Date.now());
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -259,7 +379,7 @@
                     loading.style.display = 'none';
                     content.style.display = 'block';
                 } else {
-                    throw new Error('Dữ liệu không hợp lệ');
+                    throw new Error('Invalid data format');
                 }
             } catch (err) {
                 loading.style.display = 'none';
@@ -269,12 +389,11 @@
             }
         }
         
-        // Tải dữ liệu khi trang load
+        // Load data on page load
         loadData();
         
-        // Auto refresh mỗi 60 giây
+        // Auto refresh every 60 seconds
         setInterval(loadData, 60000);
     </script>
 </body>
 </html>
-
