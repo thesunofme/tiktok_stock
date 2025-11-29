@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok Accounts Inventory</title>
+    <link rel="icon" type="image/png" href="tiktok_logo.png">
+    <link rel="shortcut icon" type="image/png" href="tiktok_logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -157,15 +159,46 @@
             margin-bottom: 1rem;
             opacity: 0.5;
         }
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .logo-header img {
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+        }
+        .logo-header img:hover {
+            transform: scale(1.1);
+        }
+        @media (max-width: 640px) {
+            .logo-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .logo-header h1 {
+                font-size: 2.5rem;
+            }
+            .logo-header img {
+                height: 3rem;
+                width: 3rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8 animate-fadeIn">
-            <h1 class="text-5xl font-extrabold text-white mb-4 drop-shadow-lg">
-                <i class="fas fa-box-open"></i> TikTok Accounts Inventory
-            </h1>
+            <div class="logo-header">
+                <img src="tiktok_logo.png" alt="TikTok Logo" class="h-16 w-16 object-contain">
+                <h1 class="text-5xl font-extrabold text-white drop-shadow-lg">
+                    TikTok Accounts Inventory
+                </h1>
+            </div>
             <p class="text-xl text-white/90">Real-time stock availability by country</p>
         </div>
 
@@ -242,6 +275,7 @@
         <!-- Footer -->
         <div class="text-center mt-8 text-white/80 text-sm">
             <p><i class="fas fa-sync-alt"></i> Data updates automatically</p>
+            <p class="text-sm mt-2"><i class="fas fa-clock"></i> Inventory auto-updates every 5 minutes</p>
             <p class="text-xs mt-1 opacity-75">Last updated: <span id="last-update">-</span></p>
         </div>
     </div>
